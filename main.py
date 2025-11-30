@@ -227,8 +227,17 @@ async def delete_after(bot, chat_id: int, msg_id: int, delay: int):
 
 
 async def reply_autodelete(message, context: ContextTypes.DEFAULT_TYPE, text: str, reply_markup=None):
+    # Group ke delay ke hisaab se auto delete
     delay = context.chat_data.get("delay", DELETE_DELAY)
-    sent = await message.reply_text(text, reply_markup=reply_markup)
+
+    sent = await message.reply_text(
+        text,
+        reply_markup=reply_markup,
+        parse_mode="Markdown",          # <- bold/italic/special formatting
+        disable_web_page_preview=True   # <- link preview band
+    )
+
+    # Auto delete reply
     asyncio.create_task(delete_after(context.bot, sent.chat.id, sent.message_id, delay))
     return sent
 
